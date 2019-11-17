@@ -1,6 +1,6 @@
 var parser = require("node-c-parser");
 
-parser.lexer.cppUnit.clearPreprocessors("t.c", function(err, codeText){
+parser.lexer.cppUnit.clearPreprocessors( process.argv[2], function(err, codeText){
     if(err){
         // Error occured during preprocessor removal. Handle it.
 	console.log( 'ERROR' );
