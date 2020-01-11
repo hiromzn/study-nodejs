@@ -1,6 +1,6 @@
 var Glob = require("glob").Glob;
 
-var pattern = "test/a/**/[cg]/../[cg]"
+var pattern = "../../../**/*.[ch]"
 console.log(pattern)
 
 var mg = new Glob(pattern, function (er, matches) {
