@@ -10,12 +10,26 @@ for ( var i in array ) {
     console.log( i + ':' + array[i] );
 }
 
-var car = { myCar: 'Saturn', getCar: carTypes('Honda'), special: sales };
+// define function
+const carTypes = function( com ) { return( com + "_car" ); };
+const special = (type => 'special_is_' + type);
+
+var car = { myCar: 'Saturn', getCar: carTypes('Honda'), special: special( 'sale' ) };
+console.log( car );
 var car = { manyCars: {a: 'Saab', b: 'Jeep'}, 7: 'Mazda' };
+console.log( car );
 
 var unusualPropertyNames = {
-    '': '空文字列',
-    '!': 'バン！'
+    '': 'NULL',
+    '!': 'Bikkuri'
   };
 console.log(unusualPropertyNames['']);  // 空文字列
 console.log(unusualPropertyNames['!']); // バン！
+
+var car = {};
+// let car; // ERROR pattern
+car.type = "1box";
+car.size = "big";
+
+console.log( car );
+

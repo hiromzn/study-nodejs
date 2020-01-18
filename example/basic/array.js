@@ -73,3 +73,12 @@ array2 = ['first', 'second', undefined, 'fourth'];
 array2.forEach(function(element) {
     console.log(element + ' : ' + ( element == undefined ) );
 }); 
+let list = [];
+let list2 = [ 10, 20 ];
+
+list.push( "1" );
+list.push( "2" );
+list.forEach( val => { console.log( val ) });
+list2.forEach( (val, index) => {
+	console.log( `index:${index} : val:${val}` );
+});
