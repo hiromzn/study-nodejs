@@ -1,0 +1,65 @@
+[
+    {
+		"match": "-RecordDecl\\s+(\\S+)\\s+<.*>\\s+.*(struct\\s+\\S+)\\sdefinition$",
+		"type" : "STRUCT",
+		"args": [
+			"astid",
+			"name"
+		]
+	},
+    {
+		"match": "-RecordDecl\\s+(\\S+)\\s+<.*>\\s+struct definition$",
+		"type" : "STRUCT_NONAME",
+		"args": [
+			"astid"
+		]
+	},
+    {
+		"match": "-FieldDecl\\s+(\\S+)\\s+<.*>\\s+\\S+\\s+(\\S+)\\s+'(.+)'$",
+		"type" : "MEMBER",
+		"args": [
+			"astid",
+			"name",
+			"type"
+		]
+	},
+    {
+		"match": "-FieldDecl\\s+(\\S+)\\s+<.*>\\s+(\\S+)\\s+'([^:]+)'$",
+		"type" : "MEMBER",
+		"args": [
+			"astid",
+			"name",
+			"type"
+		]
+	},
+    {
+		"match": "-FieldDecl\\s+(\\S+)\\s+<.*>\\s+(\\S+)\\s+'(.+)':'(.+)'$",
+		"type" : "MEMBER",
+		"args": [
+			"astid",
+			"name",
+			"type",
+			"type2"
+		]
+	},
+    {
+		"match": "-TypedefDecl\\s+(\\S+)\\s+<.*>\\s+\\S+\\s+(\\S+)\\s+'(.+)':'(.+)'",
+		"type" : "TYPEDEF",
+		"args": [
+			"astid",
+			"name",
+			"org",
+			"org2"
+		]
+	},
+    {
+		"match": "-TypedefDecl\\s+(\\S+)\\s+<.*>\\s+(\\S+)\\s+'(.+)':'(.+)'",
+		"type" : "TYPEDEF",
+		"args": [
+			"astid",
+			"name",
+			"org",
+			"org2"
+		]
+	}
+]

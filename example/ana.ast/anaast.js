@@ -1,13 +1,16 @@
 "use strict";
 
 const debug = false;
+const trace = false;
 
 const fs = require('fs');
 const readline = require('readline');
 const glob = require('glob');
 
+const rules = require(`${__dirname}/rule.json`);
+
 // main
-glob('data/*.ast', (error, files) => {
+glob('data/test2.ast', (error, files) => {
 	if (error) throw error;
 	console.log(`DONE : All files: ${JSON.stringify(files)}`);
 })
@@ -44,43 +47,41 @@ function pattern( line )
 
     //console.log('Line info:', islast, level );
 
-	let res;
-	if ( res = line.match( /-RecordDecl\s+(\S+)\s+<.*>\s+.*(struct\s+\S+)\sdefinition/ ) ) {
-		current_struct = {
-			level : level,
-			astid : res[1],
-			name  : res[2],
-			member : []
-		};
-		structs.push( current_struct );
-		if (debug) console.log( "RecordDecl:%s", current_struct );
-	}
-
-	if ( (res = line.match( /-FieldDecl\s+(\S+)\s+<.*>\s+\S+\s+(\S+)\s+'(.+)'/ )) ||
-		 (res = line.match( /-FieldDecl\s+(\S+)\s+<.*>\s+.*(\S+)\s+'(.+)'/ )) ) {
-		let mem = {
-			level : level,
-			astid : res[1],
-			name  : res[2],
-			type  : res[3]
-		};
-		if (current_struct) {
-			current_struct.member.push( mem );
-			if (debug) console.log( "FieldDecl:%s", mem );
-			if (islast) current_struct = null;
+	let ret = null;
+	let mary;
+	let rule;
+    for (rule of rules)
+		if (mary = line.match(new RegExp(rule.match))) {
+			ret = { type : rule.type };
+			mary.forEach( (val, index) => {
+				if (trace) console.log( index, val );
+				if ( index > 0 ) {
+					ret[rule.args[index-1]] = val;
+				}
+			});
+			if (debug) console.log( "## TYPE: " + rule.type );
+			if ( rule.type == "STRUCT" ) {
+				ret.member = [];
+				current_struct = ret;
+				structs.push( current_struct );
+			}
+			if ( rule.type == "STRUCT_NONAME" ) {
+				ret.member = [];
+				current_struct = ret;
+				structs.push( current_struct );
+			}
+			if ( rule.type == "MEMBER" ) {
+				if (current_struct) {
+					current_struct.member.push( ret );
+					if (islast && current_struct.name) current_struct = null;
+				}
+			}
+			if ( rule.type == "TYPEDEF" ) {
+				if (current_struct) {
+					current_struct.name = ret.name;
+					current_struct = null;
+				}
+				typedefs.push( ret );
+			}
 		}
-	}
-
-	if ( (res = line.match( /-TypedefDecl\s+(\S+)\s+<.*>\s+\S+\s+(\S+)\s+'(.+)':'(.+)'/ )) ||
-		 (res = line.match( /-TypedefDecl\s+(\S+)\s+<.*>\s+.*(\S+)\s+'(.+)':'(.+)'/ )) ) {
-		let tdef = {
-			level : level,
-			astid : res[1],
-			name  : res[2],
-			org   : res[3],
-			org2  : res[4]
-		};
-		typedefs.push( tdef );
-		if (debug) console.log( "TypedefDecl:%s", tdef );
-	}
 }

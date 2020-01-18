@@ -1,0 +1,6 @@
+[
+    {"match":".*int\\s*", "op":"ntohl", "rev_op":"htonl"},
+    {"match":".*short\\s*", "op":"ntohs", "rev_op":"htons"},
+    {"match":"\\s*double\\s*", "op":"ntohl", "rev_op":"htonl"},
+    {"match":".+\\*\\s+", "replacement":"uint32_t"}
+]

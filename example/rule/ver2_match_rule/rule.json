@@ -1,0 +1,18 @@
+[
+    {
+		"match":"STRUCT\\s+(\\S+)\\s+(\\S+)",
+		"type" : "STRUCT",
+		"args": [
+			"name",
+			"size"
+		]
+	},
+    {
+		"match":"MEMBER\\s+(\\S+)\\s+(\\S+)",
+		"type" : "MEMBER",
+		"args": [
+			"name",
+			"type"
+		]
+	}
+]
