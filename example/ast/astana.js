@@ -1,6 +1,6 @@
 "use strict";
 
-var isON = true;
+//var isON = true;
 var isON = false;
 const debug = isON;
 const trace = isON;
@@ -30,7 +30,7 @@ function parse_file( file )
 	const lineReader = readline.createInterface({input : fs.createReadStream( file )});
 	if (debug) console.log(`check file >>>${file}`);
 	lineReader.on( 'line', function( line ) {
-		pattern( line );
+		parse_line( line );
 	});
 	lineReader.on( 'close', function( line ) {
 		console.log( "###### RESULT : FILE:%s", file );
@@ -39,59 +39,65 @@ function parse_file( file )
 	});
 }
 
-function pattern( line )
+function parse_line( line )
 {
-	const level_regex = /\-/;
-	const level = (line.search(level_regex) + 1)/2;
-
-	const lastcp = level*2-2;
-	const islast = ( line.substring(lastcp,lastcp+1) == '`' );
-
-    //console.log('Line info:', islast, level );
-
-	let obj = null;
-	let mary;
 	let rule;
-    for (rule of rules)
+    for (rule of rules) {
+		let mary;
 		if (mary = line.match(new RegExp(rule.match))) {
-			obj = {}
-			if (debug) obj.ruletype = rule.type;
-			if (debug) obj.line = line;
-			if (debug) console.log( "## TYPE: %s :%s", rule.type, line );
+			let obj = set_level_islast( line );
+			if (debug) {
+				obj.ruletype = rule.type;
+				obj.line = line;
+				console.log( "## TYPE: %s :%s", rule.type, line );
+			}
 			mary.forEach( (val, index) => {
 				if ( index > 0 ) {
 					if (trace) console.log( index, rule.args[index-1], val );
 					obj[rule.args[index-1]] = val;
 				}
 			});
-			delete obj.dummy;
 			if ( !debug ) { delete obj.position; delete obj.ruletype; }
 			if ( obj.position ) obj.position = parse_position(obj.position);
-			if ( rule.type == "STRUCT" ) {
+
+			switch (rule.type) {
+			case "STRUCT":
 				obj.member = [];
 				current_struct = obj;
 				structs.push( current_struct );
-			}
-			if ( rule.type == "MEMBER" ) {
+				break;
+			case "MEMBER":
 				if (current_struct) {
 					obj.parse_type = parse_type(obj.typestr);
 					current_struct.member.push( obj );
-					if (islast && current_struct.name != null ) {
-						if (trace) console.log( 'current_struct = null;' );
+					if (obj.islast && current_struct.name != null ) {
 						current_struct = null;
 					}
 				}
-			}
-			if ( rule.type == "TYPEDEF" ) {
+				break;
+			case "TYPEDEF":
 				if (current_struct) {
 					obj.parse_type = parse_type(obj.typestr);
 					current_struct.name = obj.name;
 					current_struct = null;
 				}
 				typedefs.push( obj );
+				break;
 			}
 			if (trace) console.log( obj );
 		}
+	}
+}
+
+function set_level_islast( line )
+{
+	let obj = {};
+	const level = (line.search( /\-/ ) + 1)/2;
+	const lastcp = level*2-2;
+
+	obj.level = level;
+	obj.isLast = ( line.substring(lastcp,lastcp+1) == '`' );
+	return( obj );
 }
 
 function parse_position(str)
@@ -135,15 +141,15 @@ function parse_type(str)
 	let mary;
 
 	let type = {};
-	console.log( "type: str:%s", str );
+	if (debug) console.log( "type: str:%s", str );
 
 	type.name = str.match( regex_typename )[1].replace( /\s+$/, '' );
-	type.is_pointer = (str.match( regex_pointer ) ? true : false );
+	type.isPointer = (str.match( regex_pointer ) ? true : false );
 
-	if ( type.is_struct = (str.match( regex_struct ) ? true : false ) )
+	if ( type.isStruct = (str.match( regex_struct ) ? true : false ) )
 		type.name = type.name.replace( /^struct\s+/, '' );
 
-	type.is_array = get_arry_size( str );
+	type.isArray = get_arry_size( str );
 
 	type.type = "struct";
     for (typeptn of basictypes) {
@@ -153,8 +159,8 @@ function parse_type(str)
 			break;
 		}
 	}
-	if (type.type.match( "struct" )) type.is_struct = true;
-	console.log( type );
+	if (type.type.match( "struct" )) type.isStruct = true;
+	if (debug) console.log( type );
 	return( type );
 }
 

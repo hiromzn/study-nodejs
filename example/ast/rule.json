@@ -1,34 +1,29 @@
 [
     {
-		"match": "-RecordDecl\\s+(\\S+)\\s+<(.*)>\\s*\\S*\\s+struct\\s+(\\S+)*\\s*definition$",
+		"match": "-RecordDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+struct\\s+(\\S+)*\\s*definition$",
 		"type" : "STRUCT",
 		"args": [
-			"dummy",
 			"position",
 			"name"
 		]
 	},
     {
-		"match": "-FieldDecl\\s+(\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(:'([^:]+)')*$",
+		"match": "-FieldDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(?::'([^:]+)')*$",
 		"type" : "MEMBER",
 		"args": [
-			"dummy",
 			"position",
 			"name",
 			"typestr",
-			"dummy",
 			"typestr2"
 		]
 	},
     {
-		"match": "-TypedefDecl\\s+(\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(:'([^:]+)')*$",
+		"match": "-TypedefDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(?::'([^:]+)')*$",
 		"type" : "TYPEDEF",
 		"args": [
-			"dummy",
 			"position",
 			"name",
 			"typestr",
-			"dummy",
 			"typestr2"
 		]
 	}
