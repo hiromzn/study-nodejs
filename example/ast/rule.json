@@ -15,9 +15,9 @@
 			"dummy",
 			"position",
 			"name",
-			"type",
+			"typestr",
 			"dummy",
-			"type2"
+			"typestr2"
 		]
 	},
     {
@@ -27,9 +27,9 @@
 			"dummy",
 			"position",
 			"name",
-			"type",
+			"typestr",
 			"dummy",
-			"type2"
+			"typestr2"
 		]
 	}
 ]

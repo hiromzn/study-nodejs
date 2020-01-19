@@ -10,9 +10,10 @@ const readline = require('readline');
 const glob = require('glob');
 
 const rules = require(`${__dirname}/rule.json`);
+const basictypes = require(`${__dirname}/rule_basictype.json`);
 
 // main
-glob('data/*.ast', (error, files) => {
+glob('data/test2.ast', (error, files) => {
 	if (error) {
 		throw error;
 	} else {
@@ -73,6 +74,7 @@ function pattern( line )
 			}
 			if ( rule.type == "MEMBER" ) {
 				if (current_struct) {
+					obj.parse_type = parse_type(obj.typestr);
 					current_struct.member.push( obj );
 					if (islast && current_struct.name != null ) {
 						if (trace) console.log( 'current_struct = null;' );
@@ -82,6 +84,7 @@ function pattern( line )
 			}
 			if ( rule.type == "TYPEDEF" ) {
 				if (current_struct) {
+					obj.parse_type = parse_type(obj.typestr);
 					current_struct.name = obj.name;
 					current_struct = null;
 				}
@@ -113,19 +116,61 @@ function parse_position(str)
 	return( allpos );
 }
 
+function parse_type(str)
+{
+	const regex_typename = /^([^\*\[\(]+)(?:[^\*\[\(])*/;
+	const regex_pointer = /\*(?:\[.*)*$/;
+	const regex_struct = /^struct\s+/;
+
+	const regex_array = /\[(\d+)\]/g;
+	const get_arry_size = (str) => {
+		let size = 0;
+		[...str.matchAll(regex_array)].forEach( (val, index) => {
+			if (!size) size=1;
+			size *= val[1];
+		});
+		return size;
+	};
+	let typeptn;
+	let mary;
+
+	let type = {};
+	console.log( "type: str:%s", str );
+
+	type.name = str.match( regex_typename )[1].replace( /\s+$/, '' );
+	type.is_pointer = (str.match( regex_pointer ) ? true : false );
+
+	if ( type.is_struct = (str.match( regex_struct ) ? true : false ) )
+		type.name = type.name.replace( /^struct\s+/, '' );
+
+	type.is_array = get_arry_size( str );
+
+	type.type = "struct";
+    for (typeptn of basictypes) {
+		if (mary = type.name.match(new RegExp(typeptn))) {
+			if (trace) console.log( mary );
+			type.type = mary[0];
+			break;
+		}
+	}
+	if (type.type.match( "struct" )) type.is_struct = true;
+	console.log( type );
+	return( type );
+}
+
 /*
   type
   [unsigned] <base_type> <opt>
 
   base_type
-    int
-    char
-	short
+    [unsigned] int
+    [unsigned] char
+	[unsigned] short
+	[unsigned] long
+	[unsigned] long long
+	[unsigned] int long
 	float
 	double
-	long
-	long long
-	int long
 	struct <struct_name>
 
   option
@@ -139,8 +184,7 @@ function parse_position(str)
 	  [n][m]
 	  *[n]
 	function : ( argument part )
-	  (aaa, bbb, ccc)
-	  (aaa *, bbb, ccc *)
-	  (aaa *)
-
+	  int (aaa, bbb, ccc)
+	  void *(aaa *, bbb, ccc *)
+	  long (aaa *)
 */
