@@ -1,3 +1,16 @@
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+
+let dir = process.argv[2];
+
+console.log( `mkdirp : ${dir}` );
+fs.mkdir( dir, null, function(err) {
+    if(err) {
+	console.log( `mkdirp: ERRR:${dir}` );
+	throw err;
+    }
+    console.log( `mkdirp : OK:${dir}` );
+});
 
 function asyncOperation(cb)
 {
@@ -28,4 +41,4 @@ function t3(cb) {
 	} );
 }
 
-t1(() => { console.log("DOOOO" ); } );
+//t1(() => { console.log("DOOOO" ); } );

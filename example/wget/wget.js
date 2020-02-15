@@ -7,81 +7,85 @@ const path = require('path');
 const utilities = require('./utilities');
 
 function saveFile(filename, contents, callback) {
-	console.log( `SAVE file: ${filename}` );
-	console.log( path.dirname(filename) );
-	mkdirp(path.dirname(filename), null, err => {
-		if(err) {
-			console.log( `ERRR_DATA::::${contents}` );
+	mkdirp(path.dirname(filename)).then(
+		made => {
+			console.log(`mkdir :${filename}` );
+			fs.writeFile(filename, contents, callback);
+			return callback();
+		},
+		err => {
+			console.log( err );
 			return callback(err);
-		}
-		console.log( `DATA::::${contents}` );
-		fs.writeFile(filename, contents, callback);
-	});
-	fs.writeFile(filename, contents, callback);
-	console.log( `END SAVE file: ${filename}` );
+		});
 }
 
 function download(url, filename, callback) {
-	console.log(`Downloading ${url}`);
-	request(url, (err, response, body) => {
+    console.log(`Downloading ${url}:${filename}`);
+    request(url, (err, response, body) => {
 		if(err) {
-			console.log( `ERRR:${response}` );
+			console.log( `request ERRR:${response}` );
 			return callback(err);
 		}
-		console.log( `OK: ${filename}` );
 		saveFile(filename, body, err => {
 			if(err) {
-				console.log( `ESSSS:${response}` );
+				console.log( `ERROR: ${err}` );
 				return callback(err);
 			}
-			console.log(`Downloaded and saved: ${url}`);
-			callback(null, body);
+			console.log(`saveFile: OK : ${filename}`);
+			return callback(null, body);
 		});
-		console.log( `END OK:${response}` );
-	});
-	console.log(`END Downloading ${url}`);
-}
-
-function wget(url, nesting, callback) {
-	const filename = utilities.urlToFilename(url);
-	fs.readFile(filename, 'utf8', (err, data) => {
-		if(err) {
-			if(err.code !== 'ENOENT') {
-				return callback(err);
-			}
-			return download(url, filename, (err, data) => {
-				if(err) {
-					return callback(err);
-				}
-				wgetLinks(url, data, nesting, callback);
-			});
-		}
-		wgetLinks(url, data, nesting, callback);
 	});
 }
 
 function wgetLinks(currentUrl, data, nesting, callback) {
 	if (nesting <= 0 ) {
+		console.log( `############ END:${currentUrl}:${nesting}` );
 		return process.nextTick(callback);
 	}
 	
-	let links = utilities.getPageLInks(currentUrl, body);
+	let links = utilities.getPageLinks(currentUrl, data);
 
 	function iterate(index) {
 		if (index === links.lengrh) {
-			return callcack();
+			return callback();
 		}
-		wget(links[index], nesting - 1, (err) => {
+		if (links[index]) wget(links[index], nesting - 1, (err) => {
 			if (err) {
-				return callback(err);
+			    console.log( `ERROR: wgetLinks: nes=${nesting}: ${links[index]}` );
+			    return callback(err);
+			} else {
+				iterate(index + 1);
 			}
-			iterate(index + 1);
 		});
 	}
 	iterate(0);
 }
 
-wget(process.argv[2], (err, filename, downloaded) => {
+function wget(url, nesting, callback) {
+	console.log( `URL: nes=${nesting}: ${url}` );
+	const filename = utilities.urlToFilename(url);
+	fs.readFile(filename, 'utf8', (err, data) => {
+
+		if(err) {
+			if(err.code !== 'ENOENT') {
+				return callback(err);
+			}
+			if ( ! fs.existsSync(filename)) {
+				return download(url, filename, (err, data) => {
+					if(err) {
+						console.log( `ERROR : readFile : nes=${nesting}:${filename}` );
+						console.log( err );
+						return callback( err );
+					}
+					wgetLinks(url, data, nesting, callback);
+				});
+			}
+		}
+		wgetLinks(url, data, nesting, callback);
+	});
+}
+
+wget(process.argv[2], 1, (err, filename, downloaded) => {
   if(err) {
     console.log(err);
   } else if(downloaded){
