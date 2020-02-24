@@ -1,5 +1,18 @@
 var obj = { 'a':10, 'b':20 };
 
+console.log( obj );
+console.log( obj['a'] );
+console.log( obj["a"] );
+console.log( obj['b'] );
+obj['b'] = 99;
+console.log( obj['b'] );
+
+var obj = new Object();
+
+obj.a=10;
+console.log( obj );
+
+
 for ( var i in obj ) {
     console.log( i + ':' + obj[i] );
 }
