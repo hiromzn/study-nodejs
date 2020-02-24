@@ -1,4 +1,8 @@
-const fs = require("fs");
-const infile = fs.readFileSync( process.argv[2], { encoding: 'euc-jp' });
+"use strict";
 
-console.log( infile );
+const futil = require("./fileutil");
+
+futil.readFileLineAsync( "input.data", (line) => {
+    console.log(line);
+});
+
