@@ -1,0 +1,10 @@
+[
+	"(?:unsigned )*char",
+	"(?:unsigned )*short",
+	"(?:unsigned )*int",
+	"(?:unsigned )*long",
+	"(?:unsigned )*long int",
+	"(?:unsigned )*long long",
+	"float",
+	"double"
+]

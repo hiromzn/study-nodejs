@@ -1,0 +1,30 @@
+[
+    {
+		"match": "-RecordDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+struct\\s+(\\S+)*\\s*definition$",
+		"type" : "STRUCT",
+		"args": [
+			"position",
+			"name"
+		]
+	},
+    {
+		"match": "-FieldDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(?::'([^:]+)')*$",
+		"type" : "MEMBER",
+		"args": [
+			"position",
+			"name",
+			"typestr",
+			"typestr2"
+		]
+	},
+    {
+		"match": "-TypedefDecl\\s+(?:\\S+)\\s+<(.*)>\\s*\\S*\\s+(\\S+)\\s+'([^:]+)'(?::'([^:]+)')*$",
+		"type" : "TYPEDEF",
+		"args": [
+			"position",
+			"name",
+			"typestr",
+			"typestr2"
+		]
+	}
+]
