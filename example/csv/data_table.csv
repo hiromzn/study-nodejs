@@ -1,0 +1,5 @@
+name,type,kind
+aaa,OS,cmd
+bbb,AP,func
+ccc,AP,cmd
+ddd,OS,func
